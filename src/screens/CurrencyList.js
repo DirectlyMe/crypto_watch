@@ -3,75 +3,101 @@ import {
 	StyleSheet,
 	FlatList,
 	ActionSheetIOS,
-	Button
+	View,
+	Platform
 } from 'react-native'
+import ActionButton from 'react-native-action-button'
 import { observer } from 'mobx-react'
 import ListItem from '../components/CurrencyListItem'
 import CurrencyStore from '../store'
+import UserState from '../userState'
+import { retrieveCurrencies } from '../api_and_storage_calls/currency_storage'
+import { pullSavedCurrencies } from '../api_and_storage_calls/pull_currencies'
 
 @observer
 export default class CurrencyList extends Component {
 	constructor(props) {
-		super(props);
-		this.currencyStore = CurrencyStore;
+		super(props)
+		this.currencyStore = CurrencyStore
+		this.userState = UserState
 	}
 
-	moveToDetail = ({ item }) => {
-		this.props.navigation.navigate('CurrencyDetail', {
-			currency: item,
-			store: this.store
-		})
+	componentDidMount = async () => {
+		const retrievedCurrencies = await retrieveCurrencies();
+		if (retrievedCurrencies !== null) {
+			console.log('past stored currency null check')
+			this.currencyStore.placeSavedCurrencies(retrievedCurrencies)
+			const fetchedCurrencies = await pullSavedCurrencies(this.currencyStore.savedCurrencies)
+			this.currencyStore.placeCurrencies(fetchedCurrencies)
+		} else {
+			console.log('nothing stored')
+		}
 	}
-
-	renderListItem = ({ item }) => (
-				<ListItem
-					item={item}
-					navigate={() => this.moveToDetail}
-				/>
-	)
 
 	selectCurrency = () => {
-		ActionSheetIOS.showActionSheetWithOptions(
-			{
-				options: ['Cancel', 'Bitcoin', 'Etherium', 'LiteCoin', 'XRP'],
-				cancelButtonIndex: 0
-			},
-			buttonIndex => {
-				switch (buttonIndex) {
-					case 1:
-						this.currencyStore.addCurrency({ name: 'BitCoin' });
-						break;
-					case 2:
-						this.currencyStore.addCurrency({ name: 'Etherium' });
-						break;
-					case 3:
-						this.currencyStore.addCurrency({ name: 'LiteCoin' });
-						break;
-					case 4:
-						this.currencyStore.addCurrency({ name: 'XRP' });
-						break;
+		if (Platform.OS === 'ios') {
+			ActionSheetIOS.showActionSheetWithOptions(
+				{
+					options: ['Cancel', 'Bitcoin', 'Etherium', 'LiteCoin', 'XRP'],
+					cancelButtonIndex: 0
+				},
+				buttonIndex => {
+					switch (buttonIndex) {
+						case 1:
+							this.currencyStore.addCurrency({ name: 'bitcoin', symbol: 'BTC' })
+							break
+						case 2:
+							this.currencyStore.addCurrency({ name: 'etherium', symbol: 'ETH' })
+							break
+						case 3:
+							this.currencyStore.addCurrency({ name: 'litecoin', symbol: 'LTC' })
+							break
+						case 4:
+							this.currencyStore.addCurrency({ name: 'ripple', symbol: 'XRP' })
+							break
+					}
 				}
-			}
-		)
+			)
+		} else if (Platform.OS === 'android') {
+			console.log('visible clicked')
+		}
 	}
 
 	render() {
-		const { currencies } = this.currencyStore;
-		return [
-			<FlatList
-				key="flatlist"
-				data={currencies.slice()}
-				style={styles.list}
-				keyExtractor={item => item.name}
-				renderItem={this.renderListItem}
-			/>,
-			<Button
-				key={'addbutton'}
-				title="Add Currency"
-				style={styles.createBtn}
-				onPress={this.selectCurrency}
-			/>
-		]
+		const { currencies } = this.currencyStore
+		if (currencies.length !== 0) {
+			return [
+				<FlatList
+					key="flatlist"
+					ItemSeparatorComponent={() => <View style={styles.listSeparator} />}
+					data={currencies.slice()}
+					style={styles.list}
+					keyExtractor={(item, index) => item.name}
+					renderItem={({ item }) => (
+						<ListItem
+							item={item}
+							navigation={this.props.navigation}
+							currencyStore={this.currencyStore}
+						/>
+					)}
+				/>,
+				<ActionButton
+					key="fab"
+					title="Add Currency"
+					backgroundColor="rgba(231,76,60,1)"
+					onPress={this.selectCurrency}
+				/>
+			]
+		} else {
+			return (
+				<ActionButton
+					key="fab"
+					title="Add Currency"
+					backgroundColor="rgba(231,76,60,1)"
+					onPress={this.selectCurrency}
+				/>
+			)
+		}
 	}
 }
 
@@ -81,8 +107,10 @@ const styles = StyleSheet.create({
 		paddingTop: 5,
 		backgroundColor: 'white'
 	},
-	createBtn: {
-		flex: 1,
-		backgroundColor: 'white'
+	listSeparator: {
+		backgroundColor: 'black',
+		height: 1,
+		marginRight: 20,
+		marginLeft: 20
 	}
 })

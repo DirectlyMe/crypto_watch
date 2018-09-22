@@ -26,7 +26,11 @@
     "mobx-react": "^5.2.6",
     "react": "16.3.1",
     "react-native": "~0.55.2",
+    "react-native-action-button": "^2.8.5",
+    "react-native-background-fetch": "2.0.x",
+    "react-native-background-task": "^0.2.1",
     "react-native-elements": "^0.19.1",
+    "react-native-simple-dialogs": "0.3.1",
     "react-navigation": "^2.13.0"
   }
 }

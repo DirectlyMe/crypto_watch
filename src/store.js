@@ -1,32 +1,48 @@
-import { observable, action } from 'mobx';
+import { observable, action } from 'mobx'
+import { pullSingleCurrency } from './api_and_storage_calls/pull_currencies'
+import { storeSavedCurrencies } from './api_and_storage_calls/currency_storage'
 
 class CurrencyStore {
-  @observable currencies = [
-    {
-      'name': 'BitCoin',
-      'usd': '10,0000',
-      'volume': '400,000,000',
-    },
-    {
-      'name': 'LiteCoin',
-      'usd': '40.46',
-      'volume': '837,192'
-    }
-  ];
 
-  @observable alerts = [];
+	@observable
+	currencies = []
 
-  @action addCurrency = (currency) => {
-    for (let value of this.currencies) {
-      if (value.name === currency.name) return;
-    }
-    
-    this.currencies.push(currency);
-  }
+	@observable
+	savedCurrencies = []
 
-  @action addAlert = (alert) => {
-    this.alerts.push(alert);
-  }
+	@observable
+	alerts = []
+
+	@action
+	addCurrency = async (currency) => {
+		for (let value of this.savedCurrencies) {
+			if (value.name === currency.name) return
+		}
+
+		this.savedCurrencies.push(currency)
+		storeSavedCurrencies(this.savedCurrencies)
+
+		const pulledCurr = await pullSingleCurrency(currency)
+		this.currencies.push({ name: pulledCurr.slug, data: pulledCurr })
+	}
+
+	@action
+	placeCurrencies = (currencies) => {
+		currencies.forEach((currency) => {
+			this.currencies.push({ name: currency.slug, data: currency })
+		})
+	}
+
+	@action
+	placeSavedCurrencies = (currencies) => {
+		this.savedCurrencies = currencies
+	}
+
+	@action
+	addAlert = alert => {
+		this.alerts.push(alert)
+		console.log(this.alerts)
+	}
 }
 
-export default new CurrencyStore();
+export default new CurrencyStore()

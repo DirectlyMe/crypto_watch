@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import { createStackNavigator } from 'react-navigation';
-import CurrencyList from './src/screens/CurrencyList';
+import React, { Component } from 'react'
+import { createStackNavigator } from 'react-navigation'
+import CurrencyList from './src/screens/CurrencyList'
 import CurrencyDetail from './src/screens/CurrencyDetail'
+import UserState from './src/userState'
 
 
 const Stack = createStackNavigator({
@@ -14,10 +15,16 @@ const Stack = createStackNavigator({
   CurrencyDetail: {
     screen: CurrencyDetail,
     navigationOptions: () => ({
-      title: 'Details'
+      title: UserState.selectedCurrencyName
     })
-  }
-})
+  },
+},
+{
+  headerMode: 'screen',
+  cardStyle: { backgroundColor: '#FFFFFF' }
+}
+);
+
 
 export default class App extends Component {
   render() {
