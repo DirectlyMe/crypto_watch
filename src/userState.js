@@ -1,16 +1,16 @@
 import { observable, action } from 'mobx'
 
 class UserState {
-  @observable selectedCurrencyName = 'Detail';
+  @observable selectedCurrencyName = 'Detail'
 
-  @observable dialogVisible = false;
+  @observable modalVisible = false;
 
   @action changeCurrencyName = (name) => {
-    this.selectedCurrencyName = name;
+    this.selectedCurrencyName = name
   }
 
-  @action changeDialogVisibility = (visible) => {
-    this.dialogVisible = visible;
+  @action changeModalVisibility = () => {
+    this.modalVisible = !this.modalVisible
   }
 }
 

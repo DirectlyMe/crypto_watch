@@ -25,7 +25,9 @@ export default class CurrencyDetail extends Component {
 		return (
 			<View style={styles.detailContainer}>
 				<Text>{name}</Text>
-				<Text>{usd}</Text>
+				<Text>{price}</Text>
+				<Text>{volume_24h}</Text>
+				<Text>{percent_change_24h}</Text>
 				<Button
 					style={styles.alertButton}
 					large

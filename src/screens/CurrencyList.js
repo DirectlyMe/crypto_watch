@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import {
 	StyleSheet,
+	Button,
 	FlatList,
 	ActionSheetIOS,
 	View,
 	Platform
 } from 'react-native'
 import ActionButton from 'react-native-action-button'
+import Modal from 'react-native-modal'
 import { observer } from 'mobx-react'
 import ListItem from '../components/CurrencyListItem'
 import CurrencyStore from '../store'
@@ -23,11 +25,13 @@ export default class CurrencyList extends Component {
 	}
 
 	componentDidMount = async () => {
-		const retrievedCurrencies = await retrieveCurrencies();
+		const retrievedCurrencies = await retrieveCurrencies()
 		if (retrievedCurrencies !== null) {
 			console.log('past stored currency null check')
 			this.currencyStore.placeSavedCurrencies(retrievedCurrencies)
-			const fetchedCurrencies = await pullSavedCurrencies(this.currencyStore.savedCurrencies)
+			const fetchedCurrencies = await pullSavedCurrencies(
+				this.currencyStore.savedCurrencies
+			)
 			this.currencyStore.placeCurrencies(fetchedCurrencies)
 		} else {
 			console.log('nothing stored')
@@ -47,10 +51,16 @@ export default class CurrencyList extends Component {
 							this.currencyStore.addCurrency({ name: 'bitcoin', symbol: 'BTC' })
 							break
 						case 2:
-							this.currencyStore.addCurrency({ name: 'etherium', symbol: 'ETH' })
+							this.currencyStore.addCurrency({
+								name: 'etherium',
+								symbol: 'ETH'
+							})
 							break
 						case 3:
-							this.currencyStore.addCurrency({ name: 'litecoin', symbol: 'LTC' })
+							this.currencyStore.addCurrency({
+								name: 'litecoin',
+								symbol: 'LTC'
+							})
 							break
 						case 4:
 							this.currencyStore.addCurrency({ name: 'ripple', symbol: 'XRP' })
@@ -59,7 +69,7 @@ export default class CurrencyList extends Component {
 				}
 			)
 		} else if (Platform.OS === 'android') {
-			console.log('visible clicked')
+			this.userState.changeModalVisibility()
 		}
 	}
 
@@ -86,17 +96,29 @@ export default class CurrencyList extends Component {
 					title="Add Currency"
 					backgroundColor="rgba(231,76,60,1)"
 					onPress={this.selectCurrency}
-				/>
+				/>,
+				<Modal
+					key="androidModal"
+					isVisible={this.userState.modalVisible}
+					style={styles.androidModal}>
+					<Button title="Test Button" onPress={this.selectCurrency} />
+				</Modal>
 			]
 		} else {
-			return (
+			return [
 				<ActionButton
 					key="fab"
 					title="Add Currency"
 					backgroundColor="rgba(231,76,60,1)"
 					onPress={this.selectCurrency}
-				/>
-			)
+				/>,
+				<Modal
+					key="androidModal"
+					isVisible={this.userState.modalVisible}
+					style={styles.androidModal}>
+					<Button title="Test Button" onPress={this.selectCurrency} />
+				</Modal>
+			]
 		}
 	}
 }
@@ -112,5 +134,10 @@ const styles = StyleSheet.create({
 		height: 1,
 		marginRight: 20,
 		marginLeft: 20
+	},
+	androidModal: {
+		flex: 1,
+		justifyContent: 'flex-end',
+		margin: 0
 	}
 })

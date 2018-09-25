@@ -19,7 +19,7 @@ class CurrencyListItem extends Component {
 				<View style={styles.itemContainer}>
 					<Text style={styles.currencyName}>{name}</Text>
 					<Text style={styles.currencyPrice}>{`USD: $${price}`}</Text>
-					<Text style={styles.currencyPrice}>{`Change 24 hrs: ${percent_change_24h}`}</Text>
+					<Text style={styles.currencyPrice}>{`Change 24 hrs: % ${percent_change_24h}`}</Text>
 					<Text style={styles.currencyPrice}>{`Volume 24 hrs: ${volume_24h}`}</Text>
 				</View>
 			</TouchableHighlight>

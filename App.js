@@ -25,7 +25,6 @@ const Stack = createStackNavigator({
 }
 );
 
-
 export default class App extends Component {
   render() {
     return <Stack />
